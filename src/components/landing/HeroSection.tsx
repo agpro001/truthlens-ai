@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Shield, ArrowDown } from "lucide-react";
 import ParticleField from "./ParticleField";
@@ -12,6 +12,17 @@ const HeroSection = ({ onStartAnalyzing }: HeroSectionProps) => {
   const [displayText, setDisplayText] = useState("");
   const [showCursor, setShowCursor] = useState(true);
   const fullText = "In a world where anything can be fake…\nknowing the truth is power.";
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
 
   useEffect(() => {
     let i = 0;
@@ -35,15 +46,48 @@ const HeroSection = ({ onStartAnalyzing }: HeroSectionProps) => {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-hero-gradient noise">
-      {/* Particle Background */}
-      <ParticleField />
+    <section ref={sectionRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-hero-gradient noise">
+      {/* Parallax Background */}
+      <motion.div style={{ y: backgroundY }} className="absolute inset-0">
+        <ParticleField />
+      </motion.div>
 
       {/* Glow Effect */}
       <div className="absolute inset-0 bg-glow pointer-events-none" />
 
+      {/* 3D Floating Elements */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: [0.1, 0.3, 0.1],
+              y: [0, -30, 0],
+              rotateX: [0, 15, 0],
+              rotateY: [0, 15, 0],
+            }}
+            transition={{
+              duration: 6 + i,
+              repeat: Infinity,
+              delay: i * 0.5,
+            }}
+            className="absolute w-20 h-20 rounded-2xl border border-primary/20 bg-primary/5"
+            style={{
+              left: `${10 + i * 15}%`,
+              top: `${20 + (i % 3) * 25}%`,
+              transformStyle: "preserve-3d",
+              perspective: "1000px",
+            }}
+          />
+        ))}
+      </div>
+
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 text-center">
+      <motion.div 
+        style={{ y: contentY, opacity, scale }}
+        className="relative z-10 container mx-auto px-4 text-center"
+      >
         {/* Logo/Brand */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -51,10 +95,15 @@ const HeroSection = ({ onStartAnalyzing }: HeroSectionProps) => {
           transition={{ duration: 0.8 }}
           className="flex items-center justify-center gap-3 mb-8"
         >
-          <div className="relative">
+          <motion.div 
+            className="relative"
+            animate={{ rotateY: [0, 360] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            style={{ transformStyle: "preserve-3d" }}
+          >
             <Shield className="w-12 h-12 text-primary animate-glow" />
             <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
-          </div>
+          </motion.div>
           <span className="text-3xl font-bold text-foreground">
             TruthLens<span className="text-primary">AI</span>
           </span>
@@ -125,7 +174,7 @@ const HeroSection = ({ onStartAnalyzing }: HeroSectionProps) => {
             <span>Source Verification</span>
           </div>
         </motion.div>
-      </div>
+      </motion.div>
 
       {/* Scroll Indicator */}
       <motion.div
