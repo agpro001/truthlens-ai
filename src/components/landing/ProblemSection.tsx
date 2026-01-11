@@ -1,4 +1,4 @@
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { AlertTriangle, Bot, ShieldAlert, Newspaper } from "lucide-react";
 
@@ -13,17 +13,61 @@ const ProblemSection = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  const y1 = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [50, -50]);
+  const rotate = useTransform(scrollYProgress, [0, 1], [5, -5]);
+
   return (
     <section ref={ref} className="relative py-32 bg-background overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
+      {/* Background Pattern with Parallax */}
+      <motion.div 
+        style={{ y: y2 }}
+        className="absolute inset-0 opacity-5"
+      >
         <div className="absolute inset-0" style={{
           backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)`,
           backgroundSize: '40px 40px'
         }} />
+      </motion.div>
+
+      {/* 3D Floating Cubes */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(4)].map((_, i) => (
+          <motion.div
+            key={i}
+            style={{ y: y1, rotate }}
+            className="absolute"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 0.1 } : {}}
+          >
+            <motion.div
+              animate={{
+                rotateX: [0, 360],
+                rotateY: [0, 360],
+              }}
+              transition={{
+                duration: 20 + i * 5,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="w-24 h-24 border border-destructive/30 rounded-lg"
+              style={{
+                left: `${15 + i * 25}%`,
+                top: `${10 + i * 20}%`,
+                transformStyle: "preserve-3d",
+                position: "absolute",
+              }}
+            />
+          </motion.div>
+        ))}
       </div>
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 relative">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -39,15 +83,15 @@ const ProblemSection = () => {
           </p>
         </motion.div>
 
-        {/* Floating Fake Content Cards */}
+        {/* Floating Fake Content Cards with 3D Effect */}
         <div className="relative h-[400px] md:h-[500px]">
           {fakeContent.map((item, index) => {
             const Icon = item.icon;
             const positions = [
-              { x: "10%", y: "20%", rotate: -5 },
-              { x: "60%", y: "10%", rotate: 3 },
-              { x: "20%", y: "60%", rotate: -3 },
-              { x: "70%", y: "55%", rotate: 5 },
+              { x: "10%", y: "20%", rotate: -5, z: 50 },
+              { x: "60%", y: "10%", rotate: 3, z: 30 },
+              { x: "20%", y: "60%", rotate: -3, z: 70 },
+              { x: "70%", y: "55%", rotate: 5, z: 40 },
             ];
             const pos = positions[index];
 
@@ -59,6 +103,8 @@ const ProblemSection = () => {
                   opacity: [0, 1, 1, 0.3],
                   scale: [0.8, 1, 1, 0.95],
                   y: [50, 0, 0, 10],
+                  rotateX: [10, 0, 0, 5],
+                  rotateY: [-5, 0, 0, 5],
                 } : {}}
                 transition={{ 
                   duration: 4,
@@ -67,7 +113,13 @@ const ProblemSection = () => {
                   repeatDelay: 2,
                 }}
                 className="absolute glass rounded-lg p-4 shadow-elevated max-w-xs"
-                style={{ left: pos.x, top: pos.y, rotate: `${pos.rotate}deg` }}
+                style={{ 
+                  left: pos.x, 
+                  top: pos.y, 
+                  rotate: `${pos.rotate}deg`,
+                  transformStyle: "preserve-3d",
+                  perspective: "1000px",
+                }}
               >
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-lg bg-destructive/10">
@@ -129,7 +181,7 @@ const ProblemSection = () => {
           </motion.div>
         </div>
 
-        {/* Stats */}
+        {/* Stats with 3D hover */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -142,7 +194,17 @@ const ProblemSection = () => {
             { value: "70%", label: "Share without verifying" },
             { value: "500%", label: "Rise in deepfakes" },
           ].map((stat, index) => (
-            <div key={index} className="text-center">
+            <motion.div 
+              key={index} 
+              className="text-center"
+              whileHover={{ 
+                scale: 1.05, 
+                rotateX: 5, 
+                rotateY: 5,
+                transition: { duration: 0.2 } 
+              }}
+              style={{ transformStyle: "preserve-3d" }}
+            >
               <motion.span
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : {}}
@@ -154,7 +216,7 @@ const ProblemSection = () => {
               <span className="text-sm text-muted-foreground mt-2 block">
                 {stat.label}
               </span>
-            </div>
+            </motion.div>
           ))}
         </motion.div>
       </div>
