@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Link, Image, Loader2 } from "lucide-react";
@@ -6,19 +6,57 @@ import TextAnalysis from "./TextAnalysis";
 import LinkAnalysis from "./LinkAnalysis";
 import ImageAnalysis from "./ImageAnalysis";
 import AnalysisResults from "./AnalysisResults";
+import UsageLimitBanner from "./UsageLimitBanner";
 import { useAnalysis } from "@/hooks/useAnalysis";
+import { useUsageLimit } from "@/hooks/useUsageLimit";
+import { toast } from "sonner";
 
 const AnalysisPanel = () => {
   const [activeTab, setActiveTab] = useState("text");
   const { analyze, isLoading, result, reset } = useAnalysis();
+  const { canUseFeature, incrementUsage, isAuthenticated } = useUsageLimit();
 
   const handleAnalyze = async (type: string, content: string | File) => {
+    if (!canUseFeature()) {
+      toast.error("Free trial exhausted. Please sign in to continue using TruthLens.");
+      return;
+    }
+
+    if (!isAuthenticated) {
+      incrementUsage();
+    }
+
     await analyze(type, content);
   };
 
   return (
-    <section id="analysis-panel" className="py-20 bg-background">
-      <div className="container mx-auto px-4">
+    <section id="analysis-panel" className="py-20 bg-background relative overflow-hidden">
+      {/* 3D Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-64 h-64 rounded-full"
+            style={{
+              background: `radial-gradient(circle, hsl(var(--primary) / 0.1), transparent)`,
+              left: `${20 + i * 15}%`,
+              top: `${10 + i * 10}%`,
+            }}
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+              y: [0, -20, 0],
+            }}
+            transition={{
+              duration: 5 + i,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="container mx-auto px-4 relative">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -26,9 +64,13 @@ const AnalysisPanel = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <span className="text-primary font-semibold text-sm uppercase tracking-wider mb-4 block">
+          <motion.span 
+            className="text-primary font-semibold text-sm uppercase tracking-wider mb-4 block"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             Analyze Now
-          </span>
+          </motion.span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             TruthLens Analysis Panel
           </h2>
@@ -44,8 +86,17 @@ const AnalysisPanel = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
           className="max-w-4xl mx-auto"
         >
-          <div className="bg-card rounded-2xl shadow-elevated border border-border overflow-hidden">
-            <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); reset(); }} className="w-full">
+          {/* Usage Limit Banner */}
+          <UsageLimitBanner />
+
+          <motion.div 
+            className="bg-card rounded-2xl shadow-elevated border border-border overflow-hidden relative"
+            whileHover={{ boxShadow: "0 20px 40px -12px rgba(0, 0, 0, 0.3)" }}
+          >
+            {/* Animated border glow */}
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 via-transparent to-secondary/20 opacity-0 hover:opacity-100 transition-opacity duration-500" />
+            
+            <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); reset(); }} className="w-full relative">
               {/* Tab List */}
               <div className="border-b border-border bg-muted/30 p-2">
                 <TabsList className="w-full grid grid-cols-3 bg-transparent gap-2 h-auto p-0">
@@ -84,8 +135,17 @@ const AnalysisPanel = () => {
                       className="flex flex-col items-center justify-center py-16"
                     >
                       <div className="relative">
-                        <Loader2 className="w-12 h-12 text-primary animate-spin" />
-                        <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        >
+                          <Loader2 className="w-12 h-12 text-primary" />
+                        </motion.div>
+                        <motion.div 
+                          className="absolute inset-0 bg-primary/20 blur-xl rounded-full"
+                          animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0.2, 0.5] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        />
                       </div>
                       <motion.div
                         className="mt-6 text-center"
@@ -127,7 +187,7 @@ const AnalysisPanel = () => {
                 </AnimatePresence>
               </div>
             </Tabs>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>
@@ -137,19 +197,20 @@ const AnalysisPanel = () => {
 const LoadingMessages = () => {
   const [messageIndex, setMessageIndex] = useState(0);
   const messages = [
-    "Reading context…",
-    "Checking authenticity…",
-    "Detecting manipulation…",
-    "Analyzing patterns…",
-    "Verifying sources…",
+    "🔍 Reading context…",
+    "🛡️ Checking authenticity…",
+    "⚠️ Detecting manipulation…",
+    "📊 Analyzing patterns…",
+    "✅ Verifying sources…",
+    "🤖 Running AI detection…",
   ];
 
-  useState(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % messages.length);
     }, 2000);
     return () => clearInterval(interval);
-  });
+  }, []);
 
   return (
     <AnimatePresence mode="wait">
