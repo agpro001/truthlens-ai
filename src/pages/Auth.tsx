@@ -144,14 +144,8 @@ const Auth = () => {
           transition={{ duration: 0.6 }}
           className="w-full max-w-md"
         >
-          {/* Back to Home */}
-          <Link
-            to="/"
-            className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 transition-colors group"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to Home
-          </Link>
+          {/* Header spacer for back button */}
+          <div className="h-8 mb-4" />
 
           {/* Auth Card */}
           <motion.div 

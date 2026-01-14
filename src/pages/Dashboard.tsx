@@ -12,7 +12,6 @@ import {
   FileText,
   Link,
   Image,
-  ArrowLeft,
   Loader2
 } from "lucide-react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -166,13 +165,8 @@ const Dashboard = () => {
 
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <RouterLink to="/">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </RouterLink>
+        <div className="flex items-center justify-between mb-8 pt-4">
+          <div className="flex items-center gap-4 ml-16">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-foreground">Dashboard</h1>
               <p className="text-muted-foreground text-sm">Your analysis history and statistics</p>
