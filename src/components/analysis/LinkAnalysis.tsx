@@ -40,18 +40,18 @@ const LinkAnalysis = ({ onAnalyze }: LinkAnalysisProps) => {
           Enter URL to analyze
         </label>
         <div className="relative">
-          <Link className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Link className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary" />
           <Input
             type="url"
             placeholder="https://example.com/article"
             value={url}
             onChange={handleChange}
-            className={`pl-10 py-6 bg-background border-border focus:border-primary transition-colors ${
-              !isValidUrl ? "border-destructive focus:border-destructive" : ""
+            className={`pl-10 py-6 bg-muted/50 border-2 hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-foreground placeholder:text-muted-foreground/70 text-base ${
+              !isValidUrl ? "border-destructive focus:border-destructive" : "border-border"
             }`}
           />
           {url && (
-            <ExternalLink className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <ExternalLink className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
           )}
         </div>
         {!isValidUrl && (

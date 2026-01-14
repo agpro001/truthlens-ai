@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Shield, Menu, X, LogIn } from "lucide-react";
+import { Shield, Menu, X, LogIn, LayoutDashboard, History } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import type { User } from "@supabase/supabase-js";
 
 interface NavbarProps {
@@ -80,11 +81,18 @@ const Navbar = ({ onHistoryClick }: NavbarProps) => {
 
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center gap-3">
+              <ThemeToggle />
               {user ? (
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground">
-                    {user.email}
-                  </span>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/dashboard">
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={onHistoryClick}>
+                    <History className="w-4 h-4" />
+                  </Button>
                   <Button variant="outline" size="sm" onClick={handleSignOut}>
                     Sign Out
                   </Button>

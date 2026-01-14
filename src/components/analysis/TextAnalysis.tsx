@@ -32,7 +32,7 @@ const TextAnalysis = ({ onAnalyze }: TextAnalysisProps) => {
           placeholder="Enter text, news article, message, or claim you want to verify..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="min-h-[150px] resize-none bg-background border-border focus:border-primary transition-colors"
+          className="min-h-[150px] resize-none bg-muted/50 border-2 border-border hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-foreground placeholder:text-muted-foreground/70 text-base"
         />
         <div className="flex items-center justify-between mt-2">
           <span className="text-xs text-muted-foreground">
