@@ -12,7 +12,8 @@ import {
   User, 
   Sparkles,
   Minimize2,
-  Maximize2 
+  Maximize2,
+  ArrowLeft
 } from "lucide-react";
 import { AnalysisResult } from "@/hooks/useAnalysis";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
@@ -34,8 +35,18 @@ const ChatAssistant = ({ analysisContext }: ChatAssistantProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { canUseFeature, incrementUsage, isAuthenticated, getRemainingUses } = useUsageLimit();
+
+  const handleBack = () => {
+    if (messages.length > 0) {
+      setMessages([]);
+      setShowWelcome(true);
+    } else {
+      setIsOpen(false);
+    }
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -160,29 +171,44 @@ const ChatAssistant = ({ analysisContext }: ChatAssistantProps) => {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - Enhanced with better animations */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 180 }}
-            whileHover={{ scale: 1.1 }}
+            whileHover={{ scale: 1.1, rotate: 5 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full shadow-2xl flex items-center justify-center text-primary-foreground group"
-            style={{ boxShadow: "0 0 30px rgba(59, 130, 246, 0.5)" }}
+            className="fixed bottom-6 right-6 z-50 w-16 h-16 bg-gradient-to-br from-primary via-primary/90 to-primary/70 rounded-full shadow-2xl flex items-center justify-center text-primary-foreground group overflow-hidden"
+            style={{ boxShadow: "0 0 40px rgba(59, 130, 246, 0.5)" }}
           >
-            <MessageCircle className="w-7 h-7" />
+            {/* Inner glow */}
             <motion.div
-              className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background"
+              className="absolute inset-1 rounded-full bg-gradient-to-tr from-white/20 to-transparent"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            />
+            <MessageCircle className="w-7 h-7 relative z-10" />
+            {/* Online indicator */}
+            <motion.div
+              className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-green-400 to-green-600 rounded-full border-2 border-background flex items-center justify-center"
               animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <div className="w-2 h-2 bg-white rounded-full" />
+            </motion.div>
+            {/* Pulse rings */}
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-primary/50"
+              animate={{ scale: [1, 1.6], opacity: [0.6, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
             <motion.div
-              className="absolute inset-0 rounded-full bg-primary/30"
-              animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              className="absolute inset-0 rounded-full border-2 border-primary/30"
+              animate={{ scale: [1, 1.8], opacity: [0.4, 0] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
             />
           </motion.button>
         )}
@@ -204,29 +230,46 @@ const ChatAssistant = ({ analysisContext }: ChatAssistantProps) => {
             style={{ boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/10 to-secondary/10">
+            <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/10 via-primary/5 to-secondary/10">
               <div className="flex items-center gap-3">
+                {/* Back Button in Chat */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleBack}
+                  className="w-8 h-8 rounded-lg bg-muted/50 hover:bg-muted flex items-center justify-center transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4 text-muted-foreground" />
+                </motion.button>
                 <motion.div
-                  animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="w-10 h-10 bg-gradient-to-br from-primary to-primary/60 rounded-xl flex items-center justify-center"
+                  animate={{ 
+                    rotate: [0, 10, -10, 0],
+                    scale: [1, 1.05, 1]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                  className="w-10 h-10 bg-gradient-to-br from-primary via-primary/80 to-primary/60 rounded-xl flex items-center justify-center shadow-lg"
                 >
                   <Bot className="w-6 h-6 text-primary-foreground" />
                 </motion.div>
                 <div>
                   <h3 className="font-semibold text-foreground flex items-center gap-2">
                     TruthLens AI
-                    <Sparkles className="w-4 h-4 text-yellow-500" />
+                    <motion.div
+                      animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <Sparkles className="w-4 h-4 text-yellow-500" />
+                    </motion.div>
                   </h3>
                   <p className="text-xs text-muted-foreground">Always here to help</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="h-8 w-8"
+                  className="h-8 w-8 hover:bg-muted/50"
                 >
                   {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                 </Button>
@@ -234,7 +277,7 @@ const ChatAssistant = ({ analysisContext }: ChatAssistantProps) => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsOpen(false)}
-                  className="h-8 w-8"
+                  className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
                 >
                   <X className="w-4 h-4" />
                 </Button>
