@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Shield, Mail, Instagram, Twitter, Heart, ArrowUp } from "lucide-react";
+import { Mail, Instagram, Twitter, Heart, ArrowUp } from "lucide-react";
+import logoImg from "@/assets/logo.jpg";
 import { Button } from "@/components/ui/button";
 
 const ContactFooter = () => {
@@ -74,7 +75,7 @@ const ContactFooter = () => {
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 style={{ transformStyle: "preserve-3d" }}
               >
-                <Shield className="w-10 h-10 text-primary" />
+                <img src={logoImg} alt="TruthLens AI" className="w-10 h-10 rounded-full object-cover" />
               </motion.div>
               <span className="text-2xl font-bold text-foreground">
                 TruthLens<span className="text-primary">AI</span>

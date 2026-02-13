@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Shield, Menu, X, LogIn, LayoutDashboard, History } from "lucide-react";
+import { Menu, X, LogIn, LayoutDashboard, History } from "lucide-react";
+import logoImg from "@/assets/logo.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -60,7 +61,7 @@ const Navbar = ({ onHistoryClick }: NavbarProps) => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
-              <Shield className="w-8 h-8 text-primary" />
+              <img src={logoImg} alt="TruthLens AI" className="w-8 h-8 rounded-full object-cover" />
               <span className="text-xl font-bold text-foreground">
                 TruthLens<span className="text-primary">AI</span>
               </span>
