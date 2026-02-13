@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import logoImg from "@/assets/logo.jpg";
 import { 
   BarChart3, 
-  Shield, 
+   
   AlertTriangle, 
   CheckCircle, 
   XCircle,
@@ -265,7 +266,7 @@ const Dashboard = () => {
             <Card className="bg-card/80 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Shield className="w-5 h-5 text-primary" />
+                  <img src={logoImg} alt="TruthLens AI" className="w-5 h-5 rounded-full object-cover" />
                   Verdict Distribution
                 </CardTitle>
               </CardHeader>

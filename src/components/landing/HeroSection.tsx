@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Shield, ArrowDown } from "lucide-react";
+import { ArrowDown } from "lucide-react";
+import logoImg from "@/assets/logo.jpg";
 import ParticleField from "./ParticleField";
 
 interface HeroSectionProps {
@@ -101,7 +102,7 @@ const HeroSection = ({ onStartAnalyzing }: HeroSectionProps) => {
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
             style={{ transformStyle: "preserve-3d" }}
           >
-            <Shield className="w-12 h-12 text-primary animate-glow" />
+            <img src={logoImg} alt="TruthLens AI" className="w-12 h-12 rounded-full object-cover" />
             <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full" />
           </motion.div>
           <span className="text-3xl font-bold text-foreground">

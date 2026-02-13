@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Mail, Lock, ArrowLeft, Eye, EyeOff, Phone, Loader2 } from "lucide-react";
+import { Mail, Lock, ArrowLeft, Eye, EyeOff, Phone, Loader2 } from "lucide-react";
+import logoImg from "@/assets/logo.jpg";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -162,7 +163,7 @@ const Auth = () => {
                 animate={{ rotateY: [0, 360] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
               >
-                <Shield className="w-10 h-10 text-primary" />
+                <img src={logoImg} alt="TruthLens AI" className="w-10 h-10 rounded-full object-cover" />
               </motion.div>
               <span className="text-2xl font-bold text-foreground">
                 TruthLens<span className="text-primary">AI</span>
