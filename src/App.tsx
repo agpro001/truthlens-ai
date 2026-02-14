@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import { Analytics } from "@vercel/analytics/react";
 import BackButton from "@/components/layout/BackButton";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -20,6 +21,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <SpeedInsights />
+        <Analytics />
         <BrowserRouter>
           <BackButton />
           <Routes>
