@@ -46,3 +46,11 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+### AI & Backend Infrastructure
+
+- **Google Gemini 2.5 Pro** - Primary AI model for misinformation detection (via Lovable Gateway)
+- **AWS Bedrock** - Enterprise-grade AI integration (Claude 3 Sonnet) available for production deployment
+- **Supabase Edge Functions** - Serverless backend for AI processing
+
+> **Note**: AWS Bedrock integration is production-ready but not currently active. See [AWS_BEDROCK_INTEGRATION.md](./AWS_BEDROCK_INTEGRATION.md) for deployment instructions.
+
