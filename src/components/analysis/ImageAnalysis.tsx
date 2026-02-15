@@ -1,13 +1,21 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, Image as ImageIcon, X } from "lucide-react";
+import { Upload, Image as ImageIcon, X, Cloud } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ImageAnalysisProps {
   onAnalyze: (file: File) => void;
+  onAnalyzeWithAWS?: (file: File) => void;
+  isLoadingAWS?: boolean;
 }
 
-const ImageAnalysis = ({ onAnalyze }: ImageAnalysisProps) => {
+const ImageAnalysis = ({ onAnalyze, onAnalyzeWithAWS, isLoadingAWS }: ImageAnalysisProps) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -49,6 +57,12 @@ const ImageAnalysis = ({ onAnalyze }: ImageAnalysisProps) => {
   const handleSubmit = () => {
     if (file) {
       onAnalyze(file);
+    }
+  };
+
+  const handleAWSSubmit = () => {
+    if (file && onAnalyzeWithAWS) {
+      onAnalyzeWithAWS(file);
     }
   };
 
@@ -152,14 +166,37 @@ const ImageAnalysis = ({ onAnalyze }: ImageAnalysisProps) => {
         </ul>
       </div>
 
-      <Button
-        onClick={handleSubmit}
-        disabled={!file}
-        className="w-full py-6 text-base font-semibold group"
-      >
-        <ImageIcon className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-        Analyze Image
-      </Button>
+      <div className="flex gap-3">
+        <Button
+          onClick={handleSubmit}
+          disabled={!file}
+          className="flex-1 py-6 text-base font-semibold group"
+        >
+          <ImageIcon className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+          Analyze Image
+        </Button>
+        
+        {onAnalyzeWithAWS && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleAWSSubmit}
+                  disabled={!file || isLoadingAWS}
+                  variant="secondary"
+                  className="flex-1 py-6 text-base font-semibold group"
+                >
+                  <Cloud className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  Verify with AWS
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Uses AWS Bedrock with Claude 3 for advanced deepfake detection</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
     </div>
   );
 };
