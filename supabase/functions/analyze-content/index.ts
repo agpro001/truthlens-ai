@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { parseLambdaResponse } from "../_shared/utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -108,15 +109,7 @@ serve(async (req) => {
 
           if (bedrockResponse.ok) {
             const bedrockData = await bedrockResponse.json();
-            let analysisResult;
-            
-            if (typeof bedrockData.body === "string") {
-              analysisResult = JSON.parse(bedrockData.body);
-            } else if (bedrockData.body) {
-              analysisResult = bedrockData.body;
-            } else {
-              analysisResult = bedrockData;
-            }
+            const analysisResult = parseLambdaResponse(bedrockData);
             
             console.log("AWS Bedrock analysis successful");
             return new Response(JSON.stringify(analysisResult), {

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { parseLambdaResponse } from "../_shared/utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -58,14 +59,7 @@ serve(async (req) => {
     const lambdaData = await lambdaResponse.json();
     
     // Parse the Lambda response - it may be stringified or direct JSON
-    let analysisResult: BedrockResponse;
-    if (typeof lambdaData.body === "string") {
-      analysisResult = JSON.parse(lambdaData.body);
-    } else if (lambdaData.body) {
-      analysisResult = lambdaData.body;
-    } else {
-      analysisResult = lambdaData;
-    }
+    const analysisResult: BedrockResponse = parseLambdaResponse(lambdaData);
 
     // Ensure all required fields exist with proper defaults
     const normalizedResult: BedrockResponse = {
