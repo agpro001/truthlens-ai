@@ -8,12 +8,14 @@ import ImageAnalysis from "./ImageAnalysis";
 import AnalysisResults from "./AnalysisResults";
 import UsageLimitBanner from "./UsageLimitBanner";
 import { useAnalysis } from "@/hooks/useAnalysis";
+import { useBedrockAnalysis } from "@/hooks/useBedrockAnalysis";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { toast } from "sonner";
 
 const AnalysisPanel = () => {
   const [activeTab, setActiveTab] = useState("text");
   const { analyze, isLoading, result, reset } = useAnalysis();
+  const { analyze: analyzeWithBedrock, isLoading: isLoadingBedrock, result: bedrockResult, reset: resetBedrock } = useBedrockAnalysis();
   const { canUseFeature, incrementUsage, isAuthenticated } = useUsageLimit();
 
   const handleAnalyze = async (type: string, content: string | File) => {
@@ -28,6 +30,27 @@ const AnalysisPanel = () => {
 
     await analyze(type, content);
   };
+
+  const handleAnalyzeWithAWS = async (type: string, content: string | File) => {
+    if (!canUseFeature()) {
+      toast.error("Free trial exhausted. Please sign in to continue using TruthLens.");
+      return;
+    }
+
+    if (!isAuthenticated) {
+      incrementUsage();
+    }
+
+    await analyzeWithBedrock(type, content);
+  };
+
+  const handleReset = () => {
+    reset();
+    resetBedrock();
+  };
+
+  const currentLoading = isLoading || isLoadingBedrock;
+  const currentResult = bedrockResult || result;
 
   return (
     <section id="analysis-panel" className="py-20 bg-background relative overflow-hidden">
@@ -96,7 +119,7 @@ const AnalysisPanel = () => {
             {/* Animated border glow */}
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 via-transparent to-secondary/20 opacity-0 hover:opacity-100 transition-opacity duration-500" />
             
-            <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); reset(); }} className="w-full relative">
+            <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); handleReset(); }} className="w-full relative">
               {/* Tab List */}
               <div className="border-b border-border bg-muted/30 p-2">
                 <TabsList className="w-full grid grid-cols-3 bg-transparent gap-2 h-auto p-0">
@@ -126,7 +149,7 @@ const AnalysisPanel = () => {
               {/* Tab Content */}
               <div className="p-6">
                 <AnimatePresence mode="wait">
-                  {isLoading ? (
+                  {currentLoading ? (
                     <motion.div
                       key="loading"
                       initial={{ opacity: 0 }}
@@ -156,14 +179,14 @@ const AnalysisPanel = () => {
                         <LoadingMessages />
                       </motion.div>
                     </motion.div>
-                  ) : result ? (
+                  ) : currentResult ? (
                     <motion.div
                       key="results"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                     >
-                      <AnalysisResults result={result} onReset={reset} />
+                      <AnalysisResults result={currentResult} onReset={handleReset} />
                     </motion.div>
                   ) : (
                     <motion.div
@@ -174,13 +197,21 @@ const AnalysisPanel = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <TabsContent value="text" className="mt-0">
-                        <TextAnalysis onAnalyze={(content) => handleAnalyze("text", content)} />
+                        <TextAnalysis 
+                          onAnalyze={(content) => handleAnalyze("text", content)} 
+                          onAnalyzeWithAWS={(content) => handleAnalyzeWithAWS("text", content)}
+                          isLoadingAWS={isLoadingBedrock}
+                        />
                       </TabsContent>
                       <TabsContent value="link" className="mt-0">
                         <LinkAnalysis onAnalyze={(url) => handleAnalyze("link", url)} />
                       </TabsContent>
                       <TabsContent value="image" className="mt-0">
-                        <ImageAnalysis onAnalyze={(file) => handleAnalyze("image", file)} />
+                        <ImageAnalysis 
+                          onAnalyze={(file) => handleAnalyze("image", file)} 
+                          onAnalyzeWithAWS={(file) => handleAnalyzeWithAWS("image", file)}
+                          isLoadingAWS={isLoadingBedrock}
+                        />
                       </TabsContent>
                     </motion.div>
                   )}

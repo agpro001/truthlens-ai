@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { parseLambdaResponse } from "../_shared/utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -83,7 +84,45 @@ serve(async (req) => {
   }
 
   try {
-    const { type, content, imageBase64 } = await req.json();
+    const { type, content, imageBase64, useAWSBedrock } = await req.json();
+    
+    // Route to AWS Bedrock if requested
+    if (useAWSBedrock) {
+      console.log(`Routing to AWS Bedrock for ${type} analysis...`);
+      const AWS_BEDROCK_LAMBDA_URL = Deno.env.get("AWS_BEDROCK_LAMBDA_URL");
+      
+      if (!AWS_BEDROCK_LAMBDA_URL) {
+        console.warn("AWS_BEDROCK_LAMBDA_URL not configured, falling back to standard analysis");
+      } else {
+        try {
+          const bedrockResponse = await fetch(AWS_BEDROCK_LAMBDA_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              type,
+              content,
+              imageBase64,
+            }),
+          });
+
+          if (bedrockResponse.ok) {
+            const bedrockData = await bedrockResponse.json();
+            const analysisResult = parseLambdaResponse(bedrockData);
+            
+            console.log("AWS Bedrock analysis successful");
+            return new Response(JSON.stringify(analysisResult), {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          } else {
+            console.warn("AWS Bedrock failed, falling back to standard analysis");
+          }
+        } catch (bedrockError) {
+          console.warn("AWS Bedrock error, falling back to standard analysis:", bedrockError);
+        }
+      }
+    }
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {

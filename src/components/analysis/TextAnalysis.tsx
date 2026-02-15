@@ -1,18 +1,32 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Cloud } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TextAnalysisProps {
   onAnalyze: (content: string) => void;
+  onAnalyzeWithAWS?: (content: string) => void;
+  isLoadingAWS?: boolean;
 }
 
-const TextAnalysis = ({ onAnalyze }: TextAnalysisProps) => {
+const TextAnalysis = ({ onAnalyze, onAnalyzeWithAWS, isLoadingAWS }: TextAnalysisProps) => {
   const [text, setText] = useState("");
 
   const handleSubmit = () => {
     if (text.trim()) {
       onAnalyze(text.trim());
+    }
+  };
+
+  const handleAWSSubmit = () => {
+    if (text.trim() && onAnalyzeWithAWS) {
+      onAnalyzeWithAWS(text.trim());
     }
   };
 
@@ -62,14 +76,37 @@ const TextAnalysis = ({ onAnalyze }: TextAnalysisProps) => {
         </div>
       </div>
 
-      <Button
-        onClick={handleSubmit}
-        disabled={!text.trim()}
-        className="w-full py-6 text-base font-semibold group"
-      >
-        <Sparkles className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-        Analyze Text
-      </Button>
+      <div className="flex gap-3">
+        <Button
+          onClick={handleSubmit}
+          disabled={!text.trim()}
+          className="flex-1 py-6 text-base font-semibold group"
+        >
+          <Sparkles className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+          Analyze Text
+        </Button>
+        
+        {onAnalyzeWithAWS && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleAWSSubmit}
+                  disabled={!text.trim() || isLoadingAWS}
+                  variant="secondary"
+                  className="flex-1 py-6 text-base font-semibold group"
+                >
+                  <Cloud className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  Verify with AWS
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Uses AWS Bedrock with Claude 3 for advanced AI analysis</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
     </div>
   );
 };
