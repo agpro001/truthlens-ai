@@ -119,7 +119,16 @@ interface BedrockRequest {
 
 /**
  * Sign AWS API requests using AWS Signature Version 4
- * This is a production-ready implementation of AWS request signing
+ * 
+ * DEMONSTRATION CODE: This is a simplified implementation showing the AWS signing pattern.
+ * In production, use the official AWS SDK for Deno or implement complete Signature V4:
+ * 
+ * Production alternatives:
+ * 1. Use AWS SDK v3: import from "npm:@aws-sdk/client-bedrock-runtime"
+ * 2. Implement full SigV4: https://docs.aws.amazon.com/IAM/latest/UserGuide/create-signed-request.html
+ * 
+ * This function demonstrates the structure and will gracefully fail with proper error handling,
+ * automatically triggering the fallback to Gemini.
  */
 async function signAWSRequest(
   method: string,
@@ -128,25 +137,27 @@ async function signAWSRequest(
   body: string,
   credentials: AWSCredentials
 ): Promise<Record<string, string>> {
-  const encoder = new TextEncoder();
+  // NOTE: This is demonstration code to show AWS integration patterns
+  // For production, use official AWS SDK or implement complete AWS Signature V4
   
-  // Create canonical request
+  console.log('[Bedrock Analyzer] AWS signing demonstration - would use AWS SDK in production');
+  
   const host = new URL(url).host;
-  const path = new URL(url).pathname;
   const datetime = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '');
   const date = datetime.slice(0, 8);
   
   headers['host'] = host;
   headers['x-amz-date'] = datetime;
   
-  // In production, implement full AWS Signature V4 signing
-  // This is a placeholder showing the structure
-  const signedHeaders = {
-    ...headers,
-    'Authorization': `AWS4-HMAC-SHA256 Credential=${credentials.accessKeyId}/${date}/${credentials.region}/bedrock/aws4_request`,
-  };
+  // Demonstration of AWS Signature V4 structure
+  // Production code would:
+  // 1. Create canonical request
+  // 2. Create string to sign
+  // 3. Calculate signature using HMAC-SHA256
+  // 4. Add Authorization header
   
-  return signedHeaders;
+  // This intentionally incomplete implementation will trigger fallback to Gemini
+  throw new Error('AWS SDK integration requires official AWS SDK - using Gemini fallback');
 }
 
 /**

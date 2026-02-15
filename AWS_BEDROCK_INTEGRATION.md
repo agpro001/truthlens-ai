@@ -2,9 +2,15 @@
 
 ## Overview
 
-TruthLens AI includes production-ready AWS Bedrock integration code for enterprise deployment scenarios. The integration uses **Claude 3 Sonnet** via AWS Bedrock for advanced misinformation detection and analysis.
+TruthLens AI includes AWS Bedrock integration architecture code for enterprise deployment scenarios. The integration demonstrates how to use **Claude 3 Sonnet** via AWS Bedrock for advanced misinformation detection and analysis.
 
-**Current Status**: The AWS Bedrock integration code exists in the codebase but is **not currently active**. The application uses Google Gemini 2.5 Pro via Lovable Gateway for all analysis during development and hackathon phases.
+**Current Status**: The AWS Bedrock integration code exists in the codebase as a **demonstration of enterprise architecture patterns**. The application uses Google Gemini 2.5 Pro via Lovable Gateway for all analysis during development and hackathon phases.
+
+**Implementation Note**: The current AWS signing implementation is intentionally simplified to demonstrate the integration pattern. For production deployment, you would:
+1. Use the official AWS SDK for Deno: `import from "npm:@aws-sdk/client-bedrock-runtime"`
+2. Or implement complete AWS Signature V4 signing per AWS documentation
+
+The code gracefully falls back to Gemini, ensuring zero disruption to functionality.
 
 ## Architecture
 
