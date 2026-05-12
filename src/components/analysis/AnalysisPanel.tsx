@@ -7,12 +7,14 @@ import LinkAnalysis from "./LinkAnalysis";
 import ImageAnalysis from "./ImageAnalysis";
 import AnalysisResults from "./AnalysisResults";
 import UsageLimitBanner from "./UsageLimitBanner";
+import LanguageSelector from "./LanguageSelector";
 import { useAnalysis } from "@/hooks/useAnalysis";
 import { useUsageLimit } from "@/hooks/useUsageLimit";
 import { toast } from "sonner";
 
 const AnalysisPanel = () => {
   const [activeTab, setActiveTab] = useState("text");
+  const [language, setLanguage] = useState("en");
   const { analyze, isLoading, result, reset } = useAnalysis();
   const { canUseFeature, incrementUsage, isAuthenticated } = useUsageLimit();
 
@@ -26,7 +28,7 @@ const AnalysisPanel = () => {
       incrementUsage();
     }
 
-    await analyze(type, content);
+    await analyze(type, content, language);
   };
 
   return (
