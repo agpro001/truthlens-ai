@@ -10,6 +10,11 @@ import BackButton from "@/components/layout/BackButton";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
+import Batch from "./pages/Batch";
+import Community from "./pages/Community";
+import ShareView from "./pages/ShareView";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +32,12 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/batch" element={<Batch />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/v/:slug" element={<ShareView />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

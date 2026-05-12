@@ -248,6 +248,23 @@ const Auth = () => {
                     {isLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
                     {mode === "signup" ? "Create Account" : "Sign In"}
                   </Button>
+
+                  {mode === "signin" && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!email) return toast.error("Enter your email above first.");
+                        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                          redirectTo: `${window.location.origin}/reset-password`,
+                        });
+                        if (error) toast.error(error.message);
+                        else toast.success("Reset link sent. Check your email.");
+                      }}
+                      className="text-xs text-primary hover:underline w-full text-center"
+                    >
+                      Forgot your password?
+                    </button>
+                  )}
                 </form>
               </TabsContent>
 

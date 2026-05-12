@@ -69,15 +69,20 @@ const Navbar = ({ onHistoryClick }: NavbarProps) => {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-8">
-              <a href="#analysis-panel" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <a href="/#analysis-panel" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Analyze
               </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                How It Works
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                About
-              </a>
+              <Link to="/batch" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Batch
+              </Link>
+              <Link to="/community" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Community
+              </Link>
+              {user && (
+                <Link to="/profile" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Profile
+                </Link>
+              )}
             </div>
 
             {/* Auth Buttons */}

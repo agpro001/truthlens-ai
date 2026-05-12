@@ -26,8 +26,10 @@ export type Database = {
           image_url: string | null
           indicators: Json
           is_bookmarked: boolean
+          language: string
           official_source_url: string | null
           official_source_verified: boolean | null
+          share_slug: string | null
           suggested_action: string | null
           user_id: string
           verdict: string
@@ -43,8 +45,10 @@ export type Database = {
           image_url?: string | null
           indicators?: Json
           is_bookmarked?: boolean
+          language?: string
           official_source_url?: string | null
           official_source_verified?: boolean | null
+          share_slug?: string | null
           suggested_action?: string | null
           user_id: string
           verdict: string
@@ -60,8 +64,10 @@ export type Database = {
           image_url?: string | null
           indicators?: Json
           is_bookmarked?: boolean
+          language?: string
           official_source_url?: string | null
           official_source_verified?: boolean | null
+          share_slug?: string | null
           suggested_action?: string | null
           user_id?: string
           verdict?: string
@@ -131,6 +137,77 @@ export type Database = {
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_reports: {
+        Row: {
+          analysis_id: string | null
+          created_at: string
+          id: string
+          is_published: boolean
+          language: string
+          snippet: string
+          title: string
+          updated_at: string
+          upvote_count: number
+          user_id: string
+          verdict: string
+        }
+        Insert: {
+          analysis_id?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          language?: string
+          snippet: string
+          title: string
+          updated_at?: string
+          upvote_count?: number
+          user_id: string
+          verdict: string
+        }
+        Update: {
+          analysis_id?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          language?: string
+          snippet?: string
+          title?: string
+          updated_at?: string
+          upvote_count?: number
+          user_id?: string
+          verdict?: string
+        }
+        Relationships: []
+      }
+      community_upvotes: {
+        Row: {
+          created_at: string
+          id: string
+          report_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          report_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          report_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_upvotes_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "community_reports"
             referencedColumns: ["id"]
           },
         ]
