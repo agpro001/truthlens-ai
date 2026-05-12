@@ -99,9 +99,9 @@ const AnalysisPanel = () => {
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-primary/20 via-transparent to-secondary/20 opacity-0 hover:opacity-100 transition-opacity duration-500" />
             
             <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); reset(); }} className="w-full relative">
-              {/* Tab List */}
-              <div className="border-b border-border bg-muted/30 p-2">
-                <TabsList className="w-full grid grid-cols-3 bg-transparent gap-2 h-auto p-0">
+              {/* Tab List + Language */}
+              <div className="border-b border-border bg-muted/30 p-2 flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+                <TabsList className="flex-1 grid grid-cols-3 bg-transparent gap-2 h-auto p-0">
                   {[
                     { value: "text", icon: FileText, label: "Text" },
                     { value: "link", icon: Link, label: "Link" },
@@ -123,6 +123,9 @@ const AnalysisPanel = () => {
                     </TabsTrigger>
                   ))}
                 </TabsList>
+                <div className="px-2 sm:border-l sm:border-border sm:pl-3">
+                  <LanguageSelector value={language} onChange={setLanguage} />
+                </div>
               </div>
 
               {/* Tab Content */}

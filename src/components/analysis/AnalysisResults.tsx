@@ -58,10 +58,41 @@ const AnalysisResults = ({ result, onReset }: AnalysisResultsProps) => {
   const config = verdictConfig[result.verdict];
   const Icon = config.icon;
 
+  const shareUrl = result.shareSlug ? `${window.location.origin}/v/${result.shareSlug}` : null;
+
   const copyToClipboard = () => {
-    const summary = `TruthLens Analysis:\n\nVerdict: ${config.label}\nConfidence: ${result.confidence}%\n\n${result.explanation}`;
+    const summary = `TruthLens Analysis:\n\nVerdict: ${config.label}\nConfidence: ${result.confidence}%\n\n${result.explanation}${shareUrl ? `\n\n${shareUrl}` : ""}`;
     navigator.clipboard.writeText(summary);
     toast.success("Copied to clipboard");
+  };
+
+  const shareLink = async () => {
+    if (!shareUrl) return toast.error("Sign in to generate a shareable link.");
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `TruthLens: ${config.label}`, text: result.explanation, url: shareUrl });
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Share link copied");
+      }
+    } catch { /* user cancelled */ }
+  };
+
+  const publishToCommunity = async () => {
+    if (!result.id) return toast.error("Sign in to publish to the community.");
+    const { data: { user } } = await (await import("@/integrations/supabase/client")).supabase.auth.getUser();
+    if (!user) return toast.error("Sign in required.");
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { error } = await supabase.from("community_reports").insert({
+      user_id: user.id,
+      analysis_id: result.id,
+      title: `${config.label} (${result.confidence}%)`,
+      snippet: result.explanation.slice(0, 280),
+      verdict: result.verdict,
+      language: result.language ?? "en",
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Published to community");
   };
 
   return (
@@ -218,12 +249,17 @@ const AnalysisResults = ({ result, onReset }: AnalysisResultsProps) => {
           <RefreshCw className="w-4 h-4 mr-2" />
           Analyze Another
         </Button>
-        <Button variant="ghost" size="icon" onClick={copyToClipboard}>
+        <Button variant="ghost" size="icon" onClick={copyToClipboard} title="Copy summary">
           <Copy className="w-4 h-4" />
         </Button>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={shareLink} title="Share link">
           <Share2 className="w-4 h-4" />
         </Button>
+        {result.id && (
+          <Button variant="secondary" size="sm" onClick={publishToCommunity} title="Publish to community">
+            Publish
+          </Button>
+        )}
       </motion.div>
 
       {/* Disclaimer */}
